@@ -1,0 +1,4 @@
+*.db
+.idea/*
+out.pdf
+output.html

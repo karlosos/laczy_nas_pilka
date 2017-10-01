@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous" media="print">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+      <style>
+      .header-row {
+        margin-top: 15px;
+        border: 1px solid black;
+        padding: 5px;
+      }
+      .right-header {
+        text-align: right;
+      }
+      .row {
+        margin-top: 10px;
+       }
+      .goals {
+        font-size: xx-small;
+       }
+       .goals thead {
+        border: 1.5px solid black;
+       }
+       .goals td {
+        border: 1px solid black;
+        width: 16.6%;
+       }
+    </style>
+  </head>
+  <body>
+   <div class="container">
+      <div class="row header-row">
+        <div class="col-6">
+          {{ teams[0][3] }} vs {{ teams[1][3] }}
+        </div>
+        <div class="col-6 right-header">
+         17.09.2017 16:00
+        </div>
+      </div>
+     <div class="row">
+
+       <div class="col-3">
+         <table class="goals">
+           <thead>
+            <th colspan="5">Gole strzelone: {{ teams[0][0][0] }}</th>
+            <th>{{ teams[0][0][0]/7.0 }} na mecz</th>
+           </thead>
+           <tbody>
+           <tr>
+             <td>0-15:</td><td>{{ teams[0][0][1][0] }}</td>
+             <td>16-30:</td><td>{{ teams[0][0][1][1] }}</td>
+             <td>31-45:</td><td>{{ teams[0][0][1][2] }}</td>
+           </tr>
+           <tr>
+             <td>46-60:</td><td>{{ teams[0][0][1][3] }}</td>
+             <td>61-75:</td><td>{{ teams[0][0][1][4] }}</td>
+             <td>76-90:</td><td>{{ teams[0][0][1][5] }}</td>
+           </tr>
+           </tbody>
+         </table>
+       </div>
+
+      <div class="col-3">
+         <table class="goals">
+           <thead>
+            <th colspan="5">Gole stracone: {{ teams[0][1][0] }}</th>
+            <th>{{ teams[0][1][0]/7.0 }} na mecz</th>
+           </thead>
+           <tbody>
+           <tr>
+             <td>0-15:</td><td>{{ teams[0][1][1][0] }}</td>
+             <td>16-30:</td><td>{{ teams[0][1][1][1] }}</td>
+             <td>31-45:</td><td>{{ teams[0][1][1][2] }}</td>
+           </tr>
+           <tr>
+             <td>46-60:</td><td>{{ teams[0][1][1][3] }}</td>
+             <td>61-75:</td><td>{{ teams[0][1][1][4] }}</td>
+             <td>76-90:</td><td>{{ teams[0][1][1][5] }}</td>
+           </tr>
+           </tbody>
+         </table>
+       </div>
+
+        <div class="col-3">
+         <table class="goals">
+           <thead>
+            <th colspan="5">Gole strzelone: {{ teams[1][0][0] }}</th>
+            <th>{{ teams[1][0][0]/7.0 }} na mecz</th>
+           </thead>
+           <tbody>
+           <tr>
+             <td>0-15:</td><td>{{ teams[1][0][1][0] }}</td>
+             <td>16-30:</td><td>{{ teams[1][0][1][1] }}</td>
+             <td>31-45:</td><td>{{ teams[1][0][1][2] }}</td>
+           </tr>
+           <tr>
+             <td>46-60:</td><td>{{ teams[1][0][1][3] }}</td>
+             <td>61-75:</td><td>{{ teams[1][0][1][4] }}</td>
+             <td>76-90:</td><td>{{ teams[1][0][1][5] }}</td>
+           </tr>
+           </tbody>
+         </table>
+       </div>
+
+      <div class="col-3">
+         <table class="goals">
+           <thead>
+            <th colspan="5">Gole stracone: {{ teams[1][1][0] }}</th>
+            <th>{{ teams[1][1][0]/7.0 }} na mecz</th>
+           </thead>
+           <tbody>
+           <tr>
+             <td>0-15:</td><td>{{ teams[1][1][1][0] }}</td>
+             <td>16-30:</td><td>{{ teams[1][1][1][1] }}</td>
+             <td>31-45:</td><td>{{ teams[1][1][1][2] }}</td>
+           </tr>
+           <tr>
+             <td>46-60:</td><td>{{ teams[1][1][1][3] }}</td>
+             <td>61-75:</td><td>{{ teams[1][1][1][4] }}</td>
+             <td>76-90:</td><td>{{ teams[1][1][1][5] }}</td>
+           </tr>
+           </tbody>
+         </table>
+       </div>
+
+     </div>
+       <div class="row">
+           <div class="col-6">
+               <h3>{{ teams[0][3] }}</h3>
+               <table class="zawodnicy">
+                   <thead>
+                    <th>Imie</th>
+                    <th>minuty</th>
+                    <th>Ostatni numer</th>
+                    <th>numery</th>
+                    <th>gole</th>
+                    <th>zk</th>
+                    <th>ck</th>
+                   </thead>
+                   <tbody>
+                   {% for player in teams[0][2] %}
+                    <tr>
+                        <td>{{ player[0] }}</td>
+                        <td>{{ player[1] }}</td>
+                        <td>{{ player[3] }}</td>
+                        <td>{{ player[2] }}</td>
+                        <td>{{ player[4] }}</td>
+                        <td>{{ player[5] }}</td>
+                        <td>{{ player[6] }}</td>
+                    </tr>
+                   {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+           <div class="col-6">
+               <h3>{{ teams[1][3] }}</h3>
+               <table class="zawodnicy">
+                   <thead>
+                    <th>Imie</th>
+                    <th>minuty</th>
+                    <th>Ostatni numer</th>
+                    <th>numery</th>
+                    <th>gole</th>
+                    <th>zk</th>
+                    <th>ck</th>
+                   </thead>
+                   <tbody>
+                   {% for player in teams[1][2] %}
+                    <tr>
+                        <td>{{ player[0] }}</td>
+                        <td>{{ player[1] }}</td>
+                        <td>{{ player[3] }}</td>
+                        <td>{{ player[2] }}</td>
+                        <td>{{ player[4] }}</td>
+                        <td>{{ player[5] }}</td>
+                        <td>{{ player[6] }}</td>
+                    </tr>
+                   {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+       </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+  </body>
+</html>
