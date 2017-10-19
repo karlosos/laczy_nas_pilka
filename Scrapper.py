@@ -2,27 +2,30 @@ import requests
 import sqlite3
 from bs4 import BeautifulSoup
 
-class Parser:
-    def __init__(self, matches_link, club_link):
-        self.matches_link = matches_link
-        self.club_link = club_link
-        self.matches_list = []
-        self.db_connection = self.create_db()
 
-        self.get_matches_list()
+class Parser:
+    def __init__(self, url_to_matches_list_page, url_to_club_page):
+        self.url_to_matches_list_page = url_to_matches_list_page
+        self.url_to_club_page = url_to_club_page
+        self.matches_links_list = []
+        self.matches = []
+        self.db_connection = self.create_db()
+        self.create_schema()
+
+        self.get_matches_links_list()
         self.analyze_matches()
 
     def get_matches_list_page(self):
-        result = requests.get(self.matches_link)
-        matches_page = result.content
-        return matches_page
+        result = requests.get(self.url_to_matches_list_page)
+        matches_list_page = result.content
+        return matches_list_page
 
     def create_db(self):
         db_connection = sqlite3.connect("stats.db")
-        self.create_schema(db_connection.cursor())
         return db_connection
 
-    def create_schema(cursor):
+    def create_schema(self):
+        cursor = self.db_connection.cursor()
         try:
             cursor.execute(
                 'CREATE TABLE `event` ( `match_id` TEXT, `minuta` INTEGER, `typ` TEXT, `zawodnik` TEXT, `team` TEXT )')
@@ -34,20 +37,20 @@ class Parser:
         except:
             print("Could not create db schema")
 
-    def get_matches_list(self):
-        soup = BeautifulSoup(self.get_matches_list_page, "html.parser")
+    def get_matches_links_list(self):
+        soup = BeautifulSoup(self.get_matches_list_page(), "html.parser")
         all_matches = soup.find_all("div", {'class': 'season__game-action'})
         for match in all_matches:
             for match_details_link in match.find_all('a', {'class': 'action'}):
-                self.matches_link.append(match_details_link['href'])
+                self.matches_links_list.append(match_details_link['href'])
 
-        self.clean_matches_list()
+        self.clean_matches_links_list()
 
-    def clean_matches_list(self):
-        self.matches_list = [x for x in self.matches_list if x != "#"]
+    def clean_matches_links_list(self):
+        self.matches_links_list = [x for x in self.matches_links_list if x != "#"]
 
     def analyze_matches(self):
-        for match in self.matches_list:
+        for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
 
             teams = {}
@@ -63,11 +66,12 @@ class Parser:
 
             teams[club_names[0]] = clubs[0]
             teams[club_names[1]] = clubs[1]
+            # jakis blad
             score = team_info_div.find('div', {'class': 'grid-8'}).text.strip()
             score_a = score[:score.find(":")]
             score_b = score[score.find(":") + 1:]
 
-            matches.append((match, clubs[0], clubs[1], score_a, score_b))
+            self.matches.append((match, clubs[0], clubs[1], score_a, score_b))
             print(club_names[0] + " " + score_a + ":" + score_b + " " + club_names[1])
 
     def get_match_page(self, match_link):
