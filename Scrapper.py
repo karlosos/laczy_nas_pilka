@@ -30,9 +30,11 @@ class Parser:
             cursor.execute(
                 'CREATE TABLE `event` ( `match_id` TEXT, `minuta` INTEGER, `typ` TEXT, `zawodnik` TEXT, `team` TEXT )')
             cursor.execute(
-                'CREATE TABLE `mecz` ( `match_id` TEXT NOT NULL, `team_a` TEXT, `team_b` TEXT, `score_a` INTEGER, `score_b` INTEGER, PRIMARY KEY(`match_id`) )')
+                'CREATE TABLE `mecz` ( `match_id` TEXT NOT NULL, `team_a` TEXT, `team_b` TEXT, `score_a` INTEGER, \
+                `score_b` INTEGER, PRIMARY KEY(`match_id`) )')
             cursor.execute(
-                'CREATE TABLE `squads` ( `player_name` TEXT, `player_id` TEXT, `numer` INTEGER,`time_played` INTEGER, `sklad` INTEGER, `team_id` TEXT, `match_id` TEXT, PRIMARY KEY(`player_id`,`match_id`) )')
+                'CREATE TABLE `squads` ( `player_name` TEXT, `player_id` TEXT, `numer` INTEGER,`time_played`\
+                 INTEGER, `sklad` INTEGER, `team_id` TEXT, `match_id` TEXT, PRIMARY KEY(`player_id`,`match_id`) )')
             cursor.execute('CREATE TABLE `team` ( `team_id` TEXT, `team_name` TEXT, PRIMARY KEY(`team_id`) )')
         except:
             print("Could not create db schema")
@@ -66,8 +68,7 @@ class Parser:
 
             teams[club_names[0]] = clubs[0]
             teams[club_names[1]] = clubs[1]
-            # jakis blad
-            score = team_info_div.find('div', {'class': 'grid-8'}).text.strip()
+            score = score_section.find('div', {'class': 'grid-8'}).text.strip()
             score_a = score[:score.find(":")]
             score_b = score[score.find(":") + 1:]
 
