@@ -16,6 +16,7 @@ class Parser:
         self.url_to_club_page = url_to_club_page
         self.matches_links_list = []
         self.matches = []
+        self.teams = {}
         self.db_connection = self.create_db()
         self.create_schema()
 
@@ -61,28 +62,29 @@ class Parser:
     def analyze_matches(self):
         for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
-
-            teams = {}
-            score_section = soup.find('section', {'class': 'report-result-logos'})
-            clubs = []
-            club_names = []
-
-            for team_info_div in score_section.find_all('div', {'class': 'grid-20'}):
-                team_link = team_info_div.find_all('a')[1]['href'].strip()
-                team_name = team_info_div.find_all('a')[1].text.strip()
-                clubs.append(team_info_div.find_all('a')[1]['href'].strip())
-                club_names.append(team_info_div.find_all('a')[1].text.strip())
-
-            teams[club_names[0]] = clubs[0]
-            teams[club_names[1]] = clubs[1]
-            score = score_section.find('div', {'class': 'grid-8'}).text.strip()
-            score_a = score[:score.find(":")]
-            score_b = score[score.find(":") + 1:]
-
-            self.matches.append((match, clubs[0], clubs[1], score_a, score_b))
-            print(club_names[0] + " " + score_a + ":" + score_b + " " + club_names[1])
+            self.get_scores(soup, match)
             print(self.get_squads(soup, match))
             print(self.get_events(soup, match))
+
+    def get_scores(self, page, match):
+        score_section = page.find('section', {'class': 'report-result-logos'})
+        clubs = []
+        club_names = []
+
+        for team_info_div in score_section.find_all('div', {'class': 'grid-20'}):
+            team_link = team_info_div.find_all('a')[1]['href'].strip()
+            team_name = team_info_div.find_all('a')[1].text.strip()
+            clubs.append(team_info_div.find_all('a')[1]['href'].strip())
+            club_names.append(team_info_div.find_all('a')[1].text.strip())
+
+        self.teams[club_names[0]] = clubs[0]
+        self.teams[club_names[1]] = clubs[1]
+        score = score_section.find('div', {'class': 'grid-8'}).text.strip()
+        score_a = score[:score.find(":")]
+        score_b = score[score.find(":") + 1:]
+
+        self.matches.append((match, clubs[0], clubs[1], score_a, score_b))
+        print(club_names[0] + " " + score_a + ":" + score_b + " " + club_names[1])
 
     def get_squads(self, page, match):
         players = []
@@ -135,6 +137,7 @@ class Parser:
             team = team[:team.find(" strzelił")]
         elif team.find('otrzymał') != -1:
             team = team[:team.find(" otrzymał")]
+        team = team.strip()
         return team.upper()
 
     def get_events(self, soup, game):
@@ -154,7 +157,7 @@ class Parser:
             team = self.team_clean(team)
             if (minuta == ''):
                 minuta = 0
-            events.append((game, int(minuta), type[0], zawodnik, teams[team]))
+            events.append((game, int(minuta), type[0], zawodnik, self.teams[team]))
         return events
 
     def get_match_page(self, match_link):
