@@ -82,6 +82,7 @@ class Parser:
             self.matches.append((match, clubs[0], clubs[1], score_a, score_b))
             print(club_names[0] + " " + score_a + ":" + score_b + " " + club_names[1])
             print(self.get_squads(soup, match))
+            print(self.get_events(soup, match))
 
     def get_squads(self, page, match):
         players = []
@@ -124,6 +125,37 @@ class Parser:
             change_time = int(change_time)
             player = player[:player.find("(")]
         return (player.strip(), change_time)
+
+    def team_clean(self, team):
+        if team.find('opuścił') != -1:
+            team = team[:team.find(" opuścił")]
+        elif team.find('wszedł') != -1:
+            team = team[:team.find(" wszedł")]
+        elif team.find('strzelił') != -1:
+            team = team[:team.find(" strzelił")]
+        elif team.find('otrzymał') != -1:
+            team = team[:team.find(" otrzymał")]
+        return team.upper()
+
+    def get_events(self, soup, game):
+        events = []
+        reports = soup.find_all('div', {'class': 'report-tracking-action'})
+        for report in reports:
+            minuta = report.find('div', {'class': 'action-time'}).text.strip();
+            minuta = minuta[:-5]
+            # print(minuta)
+            # print(game)
+            if (minuta.find("+") > 0):
+                minuta = minuta[:minuta.find("+")]
+            type = report.find('div', {'class': 'action-icon'}).find('i')['class'];
+            action_name = report.find('div', {'class': 'action-name'})
+            team = action_name.text[action_name.text.find(" z ") + 3:]
+            zawodnik = action_name.find('a')['href'].strip();
+            team = self.team_clean(team)
+            if (minuta == ''):
+                minuta = 0
+            events.append((game, int(minuta), type[0], zawodnik, teams[team]))
+        return events
 
     def get_match_page(self, match_link):
         result = requests.get(match_link)
