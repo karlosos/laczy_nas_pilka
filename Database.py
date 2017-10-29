@@ -25,3 +25,34 @@ class Database:
             cursor.execute('CREATE TABLE `team` ( `team_id` TEXT, `team_name` TEXT, PRIMARY KEY(`team_id`) )')
         except:
             print("Could not create db schema")
+
+    def add_scores(self, scores):
+        cursor = self.db_connection.cursor()
+        for score in scores:
+            try:
+                cursor.execute("INSERT INTO mecz VALUES(?, ?, ?, ?, ?)", score)
+            except sqlite3.IntegrityError:
+                pass
+
+    def add_squads(self, squads):
+        cursor = self.db_connection.cursor()
+        for squad in squads:
+            try:
+                cursor.execute("INSERT INTO squads VALUES(?, ?, ?, ?, ?, ?, ?)", squad)
+            except sqlite3.IntegrityError:
+                pass
+
+    def add_events(self, events):
+        for event in events:
+            try:
+                cur.execute("INSERT INTO event VALUES(?, ?, ?, ?, ?)", event)
+            except sqlite3.IntegrityError:
+                print(event)
+
+    def add_teams(self, teams):
+        cursor = self.db_connection.cursor()
+        for team_id, team_name in teams.items():
+            try:
+                cursor.execute("INSERT INTO team VALUES(?, ?)", (team_id, team_name))
+            except sqlite3.IntegrityError:
+                print(team)

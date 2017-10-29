@@ -3,3 +3,4 @@
 out.pdf
 output.html
 *.pyc
+__pycache__/*
