@@ -33,6 +33,7 @@ class Database:
                 cursor.execute("INSERT INTO mecz VALUES(?, ?, ?, ?, ?)", score)
             except sqlite3.IntegrityError:
                 pass
+        self.db_connection.commit()
 
     def add_squads(self, squads):
         cursor = self.db_connection.cursor()
@@ -41,13 +42,16 @@ class Database:
                 cursor.execute("INSERT INTO squads VALUES(?, ?, ?, ?, ?, ?, ?)", squad)
             except sqlite3.IntegrityError:
                 pass
+        self.db_connection.commit()
 
     def add_events(self, events):
+        cursor = self.db_connection.cursor()
         for event in events:
             try:
-                cur.execute("INSERT INTO event VALUES(?, ?, ?, ?, ?)", event)
+                cursor.execute("INSERT INTO event VALUES(?, ?, ?, ?, ?)", event)
             except sqlite3.IntegrityError:
                 print(event)
+        self.db_connection.commit()
 
     def add_teams(self, teams):
         cursor = self.db_connection.cursor()
@@ -56,3 +60,4 @@ class Database:
                 cursor.execute("INSERT INTO team VALUES(?, ?)", (team_id, team_name))
             except sqlite3.IntegrityError:
                 print(team)
+        self.db_connection.commit()

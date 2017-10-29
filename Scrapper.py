@@ -36,8 +36,8 @@ class Parser:
         for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
             self.matches.append(self.get_scores(soup, match))
-            self.squads.append(self.get_squads(soup, match))
-            self.events.append(self.get_events(soup, match))
+            self.squads += self.get_squads(soup, match)
+            self.events += self.get_events(soup, match)
 
     def get_scores(self, page, match):
         score_section = page.find('section', {'class': 'report-result-logos'})
