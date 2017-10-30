@@ -15,7 +15,8 @@ class Database:
         cursor = self.db_connection.cursor()
         try:
             cursor.execute(
-                'CREATE TABLE `event` ( `match_id` TEXT, `minuta` INTEGER, `typ` TEXT, `zawodnik` TEXT, `team` TEXT )')
+                'CREATE TABLE `event` ( `match_id` TEXT, `minuta` INTEGER, `typ` TEXT, `zawodnik` TEXT, `team` TEXT , \
+                PRIMARY KEY(`match_id`, `minuta`, `typ`, `zawodnik`))')
             cursor.execute(
                 'CREATE TABLE `mecz` ( `match_id` TEXT NOT NULL, `team_a` TEXT, `team_b` TEXT, `score_a` INTEGER, \
                 `score_b` INTEGER, PRIMARY KEY(`match_id`) )')
