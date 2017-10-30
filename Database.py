@@ -59,5 +59,5 @@ class Database:
             try:
                 cursor.execute("INSERT INTO team VALUES(?, ?)", (team_id, team_name))
             except sqlite3.IntegrityError:
-                print(team)
+                print(team_name)
         self.db_connection.commit()
