@@ -4,3 +4,4 @@ out.pdf
 output.html
 *.pyc
 __pycache__/*
+pages/*

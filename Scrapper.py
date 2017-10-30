@@ -1,5 +1,7 @@
 import requests
+import os
 from bs4 import BeautifulSoup
+import urllib
 
 
 class Parser:
@@ -134,6 +136,30 @@ class Parser:
         return events
 
     def get_match_page(self, match_link):
+        self.create_directory_if_not_exists("pages")
+        match_path = "pages/" + urllib.parse.quote(match_link, safe='')
+        if not os.path.isfile(match_path):
+            match_page = self.download_match_page(match_link, match_path)
+        else:
+            match_page = self.read_match_page_from_disk(match_path)
+        return match_page
+
+    def create_directory_if_not_exists(self, directory):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    def download_match_page(self, match_link, match_path):
+        print("Nie mamy tego kurwa: " + match_path)
         result = requests.get(match_link)
         match_page = result.content
+        file = open(match_path, 'wb')
+        file.write(match_page)
+        file.close()
+        return match_page
+
+    def read_match_page_from_disk(self, match_path):
+        print("Mamy to!:" + match_path)
+        file = open(match_path, 'rb')
+        match_page = file.read()
+        file.close()
         return match_page
