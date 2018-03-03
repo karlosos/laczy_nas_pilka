@@ -37,9 +37,23 @@ class Parser:
     def analyze_matches(self):
         for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
+            self.get_competition(soup)
             self.matches.append(self.get_scores(soup, match))
             self.squads += self.get_squads(soup, match)
             self.events += self.get_events(soup, match)
+
+    def get_competition(self, page):
+        nav_bar = page.select("nav#breadcrumbs")
+        link_series = nav_bar[0].find_all('a')
+        next_is_competition = False
+        competition = ("","")
+        for link in link_series:
+            if next_is_competition:
+                competition = (link.string.strip(), link['href'].strip())
+                break
+            if link.string.strip() == "Rozgrywki":
+                next_is_competition = True
+        print(competition)
 
     def get_scores(self, page, match):
         score_section = page.find('section', {'class': 'report-result-logos'})
