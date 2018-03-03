@@ -83,7 +83,7 @@ class Parser:
         squads = squad_grid.find_all('div', {'class': 'grid-24'})
         for squad in squads:
             club = squad.find('span').find('a')['href']
-            if (club == self.url_to_club_page):
+            if (club == self.url_to_club_page or self.url_to_club_page is None):
                 # coach = club.find('span', {'class': 'coach-name'})
                 lists = squad.find_all('div', {'class': 'report-players-list'})
                 first_players = lists[0].find_all('a')
