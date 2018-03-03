@@ -19,11 +19,13 @@ class Database:
                 PRIMARY KEY(`match_id`, `minuta`, `typ`, `zawodnik`))')
             cursor.execute(
                 'CREATE TABLE `mecz` ( `match_id` TEXT NOT NULL, `team_a` TEXT, `team_b` TEXT, `score_a` INTEGER, \
-                `score_b` INTEGER, PRIMARY KEY(`match_id`) )')
+                `score_b` INTEGER, `competition_id` TEXT, PRIMARY KEY(`match_id`) )')
             cursor.execute(
                 'CREATE TABLE `squads` ( `player_name` TEXT, `player_id` TEXT, `numer` INTEGER,`time_played`\
                  INTEGER, `sklad` INTEGER, `team_id` TEXT, `match_id` TEXT, PRIMARY KEY(`player_id`,`match_id`) )')
             cursor.execute('CREATE TABLE `team` ( `team_id` TEXT, `team_name` TEXT, PRIMARY KEY(`team_id`) )')
+            cursor.execute('CREATE TABLE `competition` ( `competition_id` TEXT, `competition_name` TEXT,\
+             PRIMARY KEY(`competition_id`) )')
         except:
             print("Could not create db schema")
 
@@ -31,7 +33,7 @@ class Database:
         cursor = self.db_connection.cursor()
         for score in scores:
             try:
-                cursor.execute("INSERT INTO mecz VALUES(?, ?, ?, ?, ?)", score)
+                cursor.execute("INSERT INTO mecz VALUES(?, ?, ?, ?, ?, ?)", score)
             except sqlite3.IntegrityError:
                 pass
         self.db_connection.commit()
@@ -61,4 +63,13 @@ class Database:
                 cursor.execute("INSERT INTO team VALUES(?, ?)", (team_id, team_name))
             except sqlite3.IntegrityError:
                 print(team_name)
+        self.db_connection.commit()
+
+    def add_competitions(self, competitions):
+        cursor = self.db_connection.cursor()
+        for competition_id, competition_name in competitions.items():
+            try:
+                cursor.execute("INSERT INTO competition VALUES(?, ?)", (competition_id, competition_name))
+            except sqlite3.IntegrityError:
+                print(competition_name)
         self.db_connection.commit()

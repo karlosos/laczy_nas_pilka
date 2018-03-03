@@ -11,6 +11,7 @@ class Parser:
         self.matches_links_list = []
         self.matches = []
         self.teams = {}
+        self.competitions = {}
         self.squads = []
         self.events = []
 
@@ -37,7 +38,6 @@ class Parser:
     def analyze_matches(self):
         for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
-            self.get_competition(soup)
             self.matches.append(self.get_scores(soup, match))
             self.squads += self.get_squads(soup, match)
             self.events += self.get_events(soup, match)
@@ -53,7 +53,7 @@ class Parser:
                 break
             if link.string.strip() == "Rozgrywki":
                 next_is_competition = True
-        print(competition)
+        return competition
 
     def get_scores(self, page, match):
         score_section = page.find('section', {'class': 'report-result-logos'})
@@ -71,9 +71,11 @@ class Parser:
         score = score_section.find('div', {'class': 'grid-8'}).text.strip()
         score_a = score[:score.find(":")]
         score_b = score[score.find(":") + 1:]
-        return ((match, clubs[0], clubs[1], score_a, score_b))
-        #self.matches.append((match, clubs[0], clubs[1], score_a, score_b))
-        #print(club_names[0] + " " + score_a + ":" + score_b + " " + club_names[1])
+
+        competition = self.get_competition(page)
+        self.competitions[competition[0]] = competition[1]
+
+        return ((match, clubs[0], clubs[1], score_a, score_b, competition[1]))
 
     def get_squads(self, page, match):
         players = []
