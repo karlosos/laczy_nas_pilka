@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Analyser:
     def __init__(self, db):
@@ -12,9 +13,22 @@ class Analyser:
         for i in range(0,150):
             goals.append(0);
 
-        print(goals)
         for goal in scored_goals:
-            print(goal[0])
             goals[goal[0]] = goals[goal[0]] + 1
 
-        print(scored_goals)
+        xp = np.linspace(0, 95, 950)
+        z = np.polyfit(range(0,150),goals, 2)
+        p = np.poly1d(z)
+
+        plt.plot(goals)
+        print(p(xp))
+        plt.plot(p(xp))
+        plt.title("Bramki liga okręgowa")
+        plt.xlabel("Minuta")
+        plt.ylabel("Bramki")
+        plt.axis([0, 95, 0, 30])
+
+        fig = plt.gcf()
+        plt.show()
+
+        print(goals)
