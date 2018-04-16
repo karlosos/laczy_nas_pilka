@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 import requests
 import os
 from bs4 import BeautifulSoup
 import urllib
+
 
 
 class Parser:
@@ -38,9 +40,11 @@ class Parser:
     def analyze_matches(self):
         for match in self.matches_links_list:
             soup = BeautifulSoup(self.get_match_page(match), "html.parser")
-            self.matches.append(self.get_scores(soup, match))
-            self.squads += self.get_squads(soup, match)
-            self.events += self.get_events(soup, match)
+            scores = self.get_scores(soup, match)
+            if scores != 0:
+                self.matches.append(self.get_scores(soup, match))
+                self.squads += self.get_squads(soup, match)
+                self.events += self.get_events(soup, match)
 
     def get_competition(self, page):
         nav_bar = page.select("nav#breadcrumbs")
@@ -65,6 +69,9 @@ class Parser:
             team_name = team_info_div.find_all('a')[1].text.strip()
             clubs.append(team_info_div.find_all('a')[1]['href'].strip())
             club_names.append(team_info_div.find_all('a')[1].text.strip())
+
+        if len(clubs) == 0:
+            return 0
 
         self.teams[club_names[0]] = clubs[0]
         self.teams[club_names[1]] = clubs[1]
