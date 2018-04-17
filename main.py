@@ -4,19 +4,19 @@ from Scrapper import Parser
 from Database import Database
 #from Analyser import Analyser
 import sqlite3
+import ORMDatabase
 
-
-# database = Database("stal.db")
+database = Database("stal.db")
 url_to_matches_list_page = "https://www.laczynaspilka.pl/druzyna-sezon/stal-szczecin/208849.html"
-# url_to_club_page = "https://www.laczynaspilka.pl/druzyna/stal-szczecin,208849.html"
-# url_to_matches_list_page = "https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html"
-# url_to_club_page = None
-# parser = Parser(url_to_matches_list_page, url_to_club_page)
-# database.add_scores(parser.matches)
-# database.add_squads(parser.squads)
-# database.add_events(parser.events)
-# database.add_teams(parser.teams)
-# database.add_competitions(parser.competitions)
+url_to_club_page = "https://www.laczynaspilka.pl/druzyna/stal-szczecin,208849.html"
+#url_to_matches_list_page = "https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html"
+#url_to_club_page = None
+parser = Parser(url_to_matches_list_page, url_to_club_page)
+database.add_scores(parser.matches)
+database.add_squads(parser.squads)
+database.add_events(parser.events)
+database.add_teams(parser.teams)
+database.add_competitions(parser.competitions)
 
 # analyser = Analyser(database.db_connection)
 # analyser.get_all_goals()
@@ -24,7 +24,7 @@ url_to_matches_list_page = "https://www.laczynaspilka.pl/druzyna-sezon/stal-szcz
 teams_output = []
 conn = sqlite3.connect("stal.db")
 cur = conn.cursor()
-cur.execute("SELECT minuta, match_id from event WHERE typ = 'i-report-ball' AND team = ? ORDER BY minuta ASC", (url_to_matches_list_page,))
+cur.execute("SELECT minuta, match_id from event WHERE typ = 'i-report-ball' AND team = ? ORDER BY minuta ASC", (url_to_club_page,))
 scored_goals = cur.fetchall()
 scored_goals_time = [0,0,0,0,0,0]
 all_goals = len(scored_goals)
