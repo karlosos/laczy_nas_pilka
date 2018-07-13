@@ -8,6 +8,7 @@ from sqlalchemy import or_
 from sqlalchemy import create_engine
 from sqlalchemy import exc
 from sqlalchemy.sql import func
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -54,7 +55,7 @@ class Squad(Base):
     time_played = Column(Integer)
     is_first_eleven = Column(Integer)
     team_id = Column(String, ForeignKey('team.id'))
-    team = relationship(lambda: Team, backref=backref('sqads'), uselist=True)
+    team = relationship(lambda: Team, backref=backref('squads'), uselist=True)
 
 
 class Competition(Base):
@@ -68,6 +69,14 @@ class Player(Base):
     id = Column(String, primary_key=True)
     name = Column(String)
     date_of_birth = Column(Date)
+    team_id = Column(String, ForeignKey('team.id'))
+    team = relationship(lambda: Team, backref=backref('sqads'), uselist=True)
+    matches = Column(Integer)
+    minutes = Column(Integer)
+    goals = Column(Integer)
+    yellow_cards = Column(Integer)
+    red_cards = Column(Integer)
+
 
 
 class Database:
@@ -97,9 +106,22 @@ class Database:
     def add_players(self, players):
         s = self.session()
         for player in players:
+            # player_link, birth, club, matches, minutes, goals, yellow_cards, red_cards
             db_player = Player()
             db_player.id = player[0]
             db_player.name = player[1]
+            if player[2] != '':
+                db_player.date_of_birth = datetime.strptime(player[2], "%d.%m.%Y").date()
+            else:
+                db_player.date_of_birth = None
+
+
+            db_player.team_id = player[3]
+            db_player.matches = player[4]
+            db_player.minutes = player[5]
+            db_player.goals = player[6]
+            db_player.yellow_cards = player[7]
+            db_player.red_cards = player[8]
             try:
                 s.add(db_player)
                 s.commit()
@@ -207,7 +229,7 @@ class Database:
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
         cur.execute(
-            "SELECT player_id, SUM(time_played) FROM squad INNER JOIN player ON (squad.player_id = player.id) WHERE team_id = ? GROUP BY `player_id` ORDER BY sum(time_played) DESC", (club_id,))
+            "SELECT player_id, SUM(time_played) FROM squad INNER JOIN player ON (squad.player_id = player.id) WHERE squad.team_id = ? GROUP BY `player_id` ORDER BY sum(time_played) DESC", (club_id,))
         team_squad_tmp = cur.fetchall()
         team_squad = []
         for player in team_squad_tmp:

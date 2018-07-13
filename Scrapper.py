@@ -16,9 +16,11 @@ class Parser:
         self.competitions = {}
         self.squads = []
         self.events = []
+        self.players = []
 
         self.get_matches_links_list()
         self.analyze_matches()
+        self.analyze_players()
 
     def get_matches_list_page(self):
         result = requests.get(self.url_to_matches_list_page)
@@ -118,6 +120,15 @@ class Parser:
                     players.append((player_name, player_id, player_number, time_played, 0, club, match))
         return players
 
+    def analyze_players(self):
+        seen = set()
+        for player in self.squads:
+            if player[1] not in seen:
+                seen.add(player[1])
+                player_info = self.get_player(player[1])
+                # player_link, birth, club, matches, minutes, goals, yellow_cards, red_cards
+                self.players.append((player[1], player[0], player_info[1], player_info[2], player_info[3], player_info[4], player_info[5], player_info[6], player_info[7]))
+
     def player_clean(self, player):
         change_time = 0
         if player.find("(") != -1:
@@ -151,12 +162,27 @@ class Parser:
             type = report.find('div', {'class': 'action-icon'}).find('i')['class'];
             action_name = report.find('div', {'class': 'action-name'})
             team = action_name.text[action_name.text.find(" z ") + 3:]
-            zawodnik = action_name.find('a')['href'].strip();
+            zawodnik = action_name.find('a')['href'].strip()
             team = self.team_clean(team)
             if (minuta == ''):
                 minuta = 0
             events.append((game, int(minuta), type[0], zawodnik, self.teams[team]))
         return events
+
+    def get_player(self, player_link):
+        try:
+            soup = BeautifulSoup(self.get_player_page(player_link), "html.parser")
+            birth = soup.find('div', {'class': 'about-player'}).find_all('span')[1].text.strip()
+            club = soup.find('section', {'class': 'fav-team'}).find('a')['href'].strip()
+            stats = soup.find('section', {'class': 'season__stats'}).find_all('div')
+            matches = stats[0].find('span', {'class': 'qty'}).text.strip();
+            minutes = stats[1].find('span', {'class': 'qty'}).text.strip();
+            goals = stats[2].find('span', {'class': 'qty'}).text.strip();
+            yellow_cards = stats[3].find_all('span')[1].text.strip();
+            red_cards = stats[3].find_all('span')[2].text.strip();
+            return player_link, birth, club, matches, minutes, goals, yellow_cards, red_cards
+        except:
+            return (player_link, '', '', '', '', '', '', '')
 
     def get_match_page(self, match_link):
         self.create_directory_if_not_exists("pages")
@@ -165,6 +191,15 @@ class Parser:
             match_page = self.download_match_page(match_link, match_path)
         else:
             match_page = self.read_match_page_from_disk(match_path)
+        return match_page
+
+    def get_player_page(self, player_link):
+        self.create_directory_if_not_exists("pages")
+        player_path = "pages/" + urllib.parse.quote(player_link, safe='')
+        if not os.path.isfile(player_path):
+            match_page = self.download_player_page(player_link, player_path)
+        else:
+            match_page = self.read_player_page_from_disk(player_path)
         return match_page
 
     def create_directory_if_not_exists(self, directory):
@@ -180,9 +215,25 @@ class Parser:
         file.close()
         return match_page
 
+    def download_player_page(self, player_link, player_path):
+        print("Jescze nie mam strony tego zawodnika: " + player_path)
+        result = requests.get(player_link)
+        player_page = result.content
+        file = open(player_path, 'wb')
+        file.write(player_page)
+        file.close()
+        return player_page
+
     def read_match_page_from_disk(self, match_path):
         print("Mamy to!:" + match_path)
         file = open(match_path, 'rb')
         match_page = file.read()
         file.close()
         return match_page
+
+    def read_player_page_from_disk(self, player_path):
+        print("Mamy to!: " + player_path)
+        file = open(player_path, 'rb')
+        player_page = file.read()
+        file.close()
+        return player_page

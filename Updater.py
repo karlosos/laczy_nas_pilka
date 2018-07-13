@@ -13,16 +13,8 @@ class Updater:
     def update(self):
         parser = Parser(self.url_to_matches_list_page, None)
         self.database.add_scores(parser.matches)
-        squads = parser.squads
-        seen = set()
-        players = []
-        for player in squads:
-            if player[1] not in seen:
-                seen.add(player[1])
-                players.append((player[1], player[0]))
-
-        self.database.add_players(players)
-        self.database.add_squads(squads)
+        self.database.add_players(parser.players)
+        self.database.add_squads(parser.squads)
         self.database.add_events(parser.events)
         self.database.add_teams(parser.teams)
         self.database.add_competitions(parser.competitions)
