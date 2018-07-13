@@ -72,6 +72,7 @@ class Player(Base):
 
 class Database:
     def __init__(self, db_name):
+        self.db_name = db_name
         self.engine = create_engine('sqlite:///' + db_name)
         self.session = sessionmaker()
         self.session.configure(bind=self.engine)
@@ -199,4 +200,32 @@ class Database:
             squad.append((player.name, last_number, numbers, minutes_played, goals, yellow_cards, red_cards))
             stop = timeit.default_timer()
             # print(stop - start)
-        print(squad)
+        return squad
+
+    def get_squad_sql(self, club_id):
+        import timeit
+        conn = sqlite3.connect(self.db_name)
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT player_id, SUM(time_played) FROM squad INNER JOIN player ON (squad.player_id = player.id) WHERE team_id = ? GROUP BY `player_id` ORDER BY sum(time_played) DESC", (club_id,))
+        team_squad_tmp = cur.fetchall()
+        team_squad = []
+        for player in team_squad_tmp:
+            player_id = player[0]
+            start = timeit.default_timer()
+            cur.execute(
+                "SELECT number, count(number) FROM squad WHERE player_id = ? GROUP BY number ORDER BY count(number) DESC",
+                (player_id,))
+            numbers = cur.fetchall()
+            cur.execute("SELECT number FROM squad WHERE player_id = ? limit 1", (player_id,))
+            last_number = cur.fetchone()[0]
+            cur.execute("SELECT count(*) FROM event WHERE player_id=? AND type='i-report-ball'", (player_id,))
+            goals = cur.fetchone()[0]
+            cur.execute("SELECT count(*) FROM event WHERE player_id=? AND type='i-yellow-card'", (player_id,))
+            yellow_cards = cur.fetchone()[0]
+            cur.execute("SELECT count(*) FROM event WHERE player_id=? AND type='i-red-card'", (player_id,))
+            red_cards = cur.fetchone()[0]
+            team_squad.append((player[0], player[1], numbers, last_number, goals, yellow_cards, red_cards));
+            stop = timeit.default_timer()
+            # print(stop - start)
+        return team_squad
