@@ -165,7 +165,7 @@ class Database:
     def add_teams(self, teams):
         # team_id, name
         s = self.session()
-        for team_id, team_name in teams.items():
+        for team_name, team_id in teams.items():
             team = Team()
             team.id = team_id
             team.name = team_name
@@ -251,3 +251,32 @@ class Database:
             stop = timeit.default_timer()
             # print(stop - start)
         return team_squad
+
+    def get_team_form(self, club_id, numer_of_matches):
+        """
+        Get last matches and return list
+        
+        List contains tuples of matches. Each tuple has format: result, name of team_a, 
+        name of team_b, score_a, score_b, date.
+        
+        :param club_id: id of club  
+        :param numer_of_matches: how many last matches to get
+        :return: list of tuples with format like ('L', 'STAL SZCZECIN', 'CHEMIK POLICE', 0, 7)
+        """
+        s = self.session()
+        form_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).limit(numer_of_matches).all()
+
+        form = []
+        for match in form_query:
+            result = ""
+            if (match.score_a == match.score_b):
+                result = "D"
+            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+                result = "W"
+            else:
+                result = "L"
+
+            # TODO add date to match
+            form.append((result, match.team_a.name, match.team_b.name, match.score_a, match.score_b))
+
+        return form
