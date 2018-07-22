@@ -3,8 +3,7 @@ import requests
 import os
 from bs4 import BeautifulSoup
 import urllib
-
-
+from datetime import datetime
 
 class Parser:
     def __init__(self, url_to_matches_list_page, url_to_club_page):
@@ -29,24 +28,30 @@ class Parser:
 
     def get_matches_links_list(self):
         soup = BeautifulSoup(self.get_matches_list_page(), "html.parser")
-        all_matches = soup.find_all("div", {'class': 'season__game-action'})
+        all_matches = soup.find_all("article", {'class': "season__game"})
         for match in all_matches:
-            for match_details_link in match.find_all('a', {'class': 'action'}):
-                self.matches_links_list.append(match_details_link['href'])
+            match_link = match.find_all("div", {'class': 'season__game-action'})[0].find_all('a', {'class': 'action'})[0]['href']
+            match_date_div = match.find_all("div", {'class': 'season__game-data'})[0]
+            match_day = match_date_div.find_all("span", {'class': 'day'})[0].text.strip()
+            match_month = match_date_div.find_all("span", {'class': 'month'})[0].text.strip()
+            match_hour = match_date_div.find_all("span", {'class': 'hour'})[0].text.strip()
+            match_date_str = match_day + "/" + match_month + " " + match_hour
+            match_date = datetime.strptime(match_date_str, "%d/%m/%Y %H:%M")
+            self.matches_links_list.append((match_link, match_date))
 
         self.clean_matches_links_list()
 
     def clean_matches_links_list(self):
-        self.matches_links_list = [x for x in self.matches_links_list if x != "#"]
+        self.matches_links_list = [x for x in self.matches_links_list if x[0] != "#"]
 
     def analyze_matches(self):
         for match in self.matches_links_list:
-            soup = BeautifulSoup(self.get_match_page(match), "html.parser")
-            scores = self.get_scores(soup, match)
+            soup = BeautifulSoup(self.get_match_page(match[0]), "html.parser")
+            scores = self.get_scores(soup, match[0])
             if scores != 0:
                 self.matches.append(self.get_scores(soup, match))
-                self.squads += self.get_squads(soup, match)
-                self.events += self.get_events(soup, match)
+                self.squads += self.get_squads(soup, match[0])
+                self.events += self.get_events(soup, match[0])
 
     def get_competition(self, page):
         nav_bar = page.select("nav#breadcrumbs")
@@ -84,7 +89,7 @@ class Parser:
         competition = self.get_competition(page)
         self.competitions[competition[0]] = competition[1]
 
-        return ((match, clubs[0], clubs[1], score_a, score_b, competition[1]))
+        return ((match[0], clubs[0], clubs[1], score_a, score_b, competition[1], match[1]))
 
     def get_squads(self, page, match):
         players = []

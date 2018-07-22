@@ -1,6 +1,6 @@
 import sqlite3
 
-from sqlalchemy import Table, Column, String, Integer, Date, ForeignKey
+from sqlalchemy import Table, Column, String, Integer, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -30,6 +30,7 @@ class Match(Base):
     score_b = Column(Integer)
     competition_id = Column(String, ForeignKey('competition.id'))
     competition = relationship(lambda: Competition, backref=backref('matches', uselist=True))
+    date = Column(DateTime)
     # team a team b score a score b competition_id
 
 
@@ -97,6 +98,7 @@ class Database:
             db_match.score_a = match[3]
             db_match.score_b = match[4]
             db_match.competition_id = match[5]
+            db_match.date = match[6]
             try:
                 s.add(db_match)
                 s.commit()
