@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_
+from sqlalchemy import desc
 from sqlalchemy import create_engine
 from sqlalchemy import exc
 from sqlalchemy.sql import func
@@ -266,7 +267,8 @@ class Database:
         :return: list of tuples with format like ('L', 'STAL SZCZECIN', 'CHEMIK POLICE', 0, 7)
         """
         s = self.session()
-        form_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).limit(numer_of_matches).all()
+        form_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id))\
+            .order_by(desc(Match.date)).limit(numer_of_matches).all()
 
         form = []
         for match in form_query:
@@ -278,7 +280,6 @@ class Database:
             else:
                 result = "L"
 
-            # TODO add date to match
-            form.append((result, match.team_a.name, match.team_b.name, match.score_a, match.score_b))
+            form.append((result, match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date))
 
         return form
