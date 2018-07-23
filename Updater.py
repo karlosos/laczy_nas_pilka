@@ -78,3 +78,11 @@ class Updater:
     def print_form(self):
         """Print form of a team"""
         print(self.database.get_team_form(self.url_to_club_page, 5))
+
+    def print_average_points_per_match(self, competition_id):
+        """
+        Print average points per match of a team
+        :param competition_id: 
+        :return: 
+        """
+        print(self.database.get_average_points_per_match(self.url_to_club_page, competition_id))

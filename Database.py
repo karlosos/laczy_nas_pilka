@@ -277,9 +277,40 @@ class Database:
                 result = "D"
             elif (match.score_a > match.score_b and match.team_a_id == club_id):
                 result = "W"
+            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+                result = "W"
             else:
                 result = "L"
 
             form.append((result, match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date))
 
         return form
+
+    def get_average_points_per_match(self, club_id, competition_id = ""):
+        """
+        Return average points per match
+        
+        :param club_id: 
+        :return: 
+        """
+
+        s = self.session()
+        if (competition_id == ""):
+            matches_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
+        else:
+            matches_query = s.query(Match).filter(Match.competition_id == competition_id)\
+                .filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
+
+        number_of_matches = len(matches_query)
+
+        points = 0
+        # calculate points
+        for match in matches_query:
+            if (match.score_a == match.score_b):
+                points = points + 1
+            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+                points = points + 3
+            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+                points = points + 3
+
+        return points/number_of_matches
