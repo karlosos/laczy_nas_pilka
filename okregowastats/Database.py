@@ -314,3 +314,68 @@ class Database:
                 points = points + 3
 
         return points/number_of_matches
+
+    def get_number_of_matches(self, club_id, competition_id=""):
+        """
+        Return number of wins, loses, draws and total matches for club in competition. 
+        If competition_id is not given then calculate wins
+        for all matches for team.
+        :param club_id: 
+        :param competition_id: 
+        :return: 
+        """
+        s = self.session()
+        if (competition_id == ""):
+            matches_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
+        else:
+            matches_query = s.query(Match).filter(Match.competition_id == competition_id) \
+                .filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
+
+        number_of_matches = len(matches_query)
+
+        wins = 0
+        loses = 0
+        draws = 0
+        # calculate points
+        for match in matches_query:
+            print(match.team_a.name + " " + str(match.score_a) + ":" + str(match.score_b) + " " + match.team_b.name)
+            if (match.score_a == match.score_b):
+                draws += 1
+            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+                wins += 1
+            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+                wins += 1
+            else:
+                loses += 1
+
+        return (wins, draws, loses, number_of_matches)
+
+    def get_win_percentage(self, club_id, competition_id=""):
+        """
+        Return ratio of win to all matches
+        :param club_id: 
+        :param competition_id: 
+        :return: 
+        """
+        matches = self.get_number_of_matches(club_id, competition_id)
+        return matches[0] / matches[3]
+
+    def get_draw_percentage(self, club_id, competition_id=""):
+        """
+        Return ratio of draws to all matches
+        :param club_id: 
+        :param competition_id: 
+        :return: 
+        """
+        matches = self.get_number_of_matches(club_id, competition_id)
+        return matches[1] / matches[3]
+
+    def get_lose_percentage(self, club_id, competition_id=""):
+        """
+        Return ratio of loses to all matches
+        :param club_id: 
+        :param competition_id: 
+        :return: 
+        """
+        matches = self.get_number_of_matches(club_id, competition_id)
+        return matches[2] / matches[3]

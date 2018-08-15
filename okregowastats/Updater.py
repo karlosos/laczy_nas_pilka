@@ -87,3 +87,27 @@ class Updater:
         :return: 
         """
         print(self.database.get_average_points_per_match(self.url_to_club_page, competition_id))
+
+    def print_win_percentage(self, competition_id):
+        """
+        Print win percentage for a team in given competition
+        :param competition_id: 
+        :return: 
+        """
+        print(self.database.get_win_percentage(self.url_to_club_page, competition_id))
+
+    def print_draw_percentage(self, competition_id):
+        """
+        Print draw percentage for a team in given competition
+        :param competition_id: 
+        :return: 
+        """
+        print(self.database.get_draw_percentage(self.url_to_club_page, competition_id))
+
+    def print_lose_percentage(self, competition_id):
+        """
+        Print lose percentage for a team in given competition
+        :param competition_id: 
+        :return: 
+        """
+        print(self.database.get_lose_percentage(self.url_to_club_page, competition_id))
