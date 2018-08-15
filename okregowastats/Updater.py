@@ -1,6 +1,7 @@
-from Scrapper import Parser
-from Database import Database
-import sqlite3
+from okregowastats.Scrapper import Parser
+
+from okregowastats.Database import Database
+
 
 class Updater:
     def __init__(self, database_name, url_to_matches_list_page, url_to_club_page):

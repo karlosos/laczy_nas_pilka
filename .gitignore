@@ -6,3 +6,5 @@ output.html
 __pycache__/*
 pages/*
 venv/
+tests/pages/
+tests/test.db

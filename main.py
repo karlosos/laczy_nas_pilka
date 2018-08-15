@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from Scrapper import Parser
-from Database import Database
-from Updater import Updater
-import sqlite3
+from okregowastats.Updater import Updater
 
 updater = Updater("newstal.db", "https://www.laczynaspilka.pl/druzyna-sezon/stal-szczecin/208849.html", "https://www.laczynaspilka.pl/druzyna/stal-szczecin,208849.html")
 #updater.update()
