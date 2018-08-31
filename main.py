@@ -12,3 +12,6 @@ updater.print_average_points_per_match("https://www.laczynaspilka.pl/rozgrywki/n
 updater.print_win_percentage("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")
 updater.print_draw_percentage("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")
 updater.print_lose_percentage("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")
+updater.print_last_matches("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")
+updater.print_last_away_matches("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")
+updater.print_last_home_matches("https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html")

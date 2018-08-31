@@ -379,3 +379,81 @@ class Database:
         """
         matches = self.get_number_of_matches(club_id, competition_id)
         return matches[2] / matches[3]
+
+    def get_last_matches(self, club_id, competition_id="", count=5):
+        """
+        Return list of last matches.
+        :param self: 
+        :param club_id: returns matches of team with this club_id
+        :param count: how many matches should return
+        :param competition_id: returns matches of team in this competition. If 
+        competition_id is set to empty string then returns matches in all competitions
+        :return: 
+        """
+
+        s = self.session()
+        if competition_id == "":
+            matches_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)) \
+                .order_by(Match.date.desc()).limit(count)
+        else:
+            matches_query = s.query(Match).filter(Match.competition_id == competition_id) \
+                    .filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)) \
+                    .order_by(Match.date.desc()).limit(count).all()
+
+        matches = []
+        for match in matches_query:
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+
+        return matches
+
+    def get_last_home_matches(self, club_id, competition_id="", count=5):
+        """
+        Return list of last home matches.
+        :param self: 
+        :param club_id: returns matches of team with this club_id
+        :param count: how many matches should return
+        :param competition_id: returns matches of team in this competition. If 
+        competition_id is set to empty string then returns matches in all competitions
+        :return: 
+        """
+
+        s = self.session()
+        if competition_id == "":
+            matches_query = s.query(Match).filter(Match.team_a_id == club_id) \
+                .order_by(Match.date.desc()).limit(count)
+        else:
+            matches_query = s.query(Match).filter(Match.competition_id == competition_id) \
+                    .filter(Match.team_a_id == club_id) \
+                    .order_by(Match.date.desc()).limit(count).all()
+
+        matches = []
+        for match in matches_query:
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+
+        return matches
+
+    def get_last_away_matches(self, club_id, competition_id="", count=5):
+        """
+        Return list of last away matches.
+        :param self: 
+        :param club_id: returns matches of team with this club_id
+        :param count: how many matches should return
+        :param competition_id: returns matches of team in this competition. If 
+        competition_id is set to empty string then returns matches in all competitions
+        :return: 
+        """
+
+        s = self.session()
+        if competition_id == "":
+            matches_query = s.query(Match).filter(Match.team_b_id == club_id) \
+                .order_by(Match.date.desc()).limit(count)
+        else:
+            matches_query = s.query(Match).filter(Match.competition_id == competition_id) \
+                    .filter(Match.team_b_id == club_id) \
+                    .order_by(Match.date.desc()).limit(count).all()
+
+        matches = []
+        for match in matches_query:
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+
+        return matches

@@ -111,3 +111,30 @@ class Updater:
         :return: 
         """
         print(self.database.get_lose_percentage(self.url_to_club_page, competition_id))
+
+    def print_last_matches(self, competition_id, count=5):
+        """
+        Print last matches for a team in given competition
+        :param competition_id: 
+        :param count: 
+        :return: 
+        """
+        print(self.database.get_last_matches(self.url_to_club_page, competition_id, count))
+
+    def print_last_home_matches(self, competition_id, count=5):
+        """
+        Print last matches for a team in given competition
+        :param competition_id: 
+        :param count: 
+        :return: 
+        """
+        print(self.database.get_last_home_matches(self.url_to_club_page, competition_id, count))
+
+    def print_last_away_matches(self, competition_id, count=5):
+        """
+        Print last matches for a team in given competition
+        :param competition_id: 
+        :param count: 
+        :return: 
+        """
+        print(self.database.get_last_away_matches(self.url_to_club_page, competition_id, count))
