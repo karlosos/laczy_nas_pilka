@@ -1,5 +1,5 @@
 from unittest import TestCase
-from okregowastats.Database import Database
+from okregowastats.database import Database
 
 class TestDatabase(TestCase):
     def test_get_average_points_per_match(self):

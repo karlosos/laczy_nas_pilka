@@ -1,6 +1,6 @@
-from okregowastats.Scrapper import Parser
+from okregowastats.parser import Parser
 
-from okregowastats.Database import Database
+from okregowastats.database import Database
 
 
 class Updater:
@@ -22,7 +22,6 @@ class Updater:
 
     def print_scored_goals(self):
         goals = self.database.get_scored_goals(self.url_to_club_page)
-        #print(goals)
         scored_goals_time = [0, 0, 0, 0, 0, 0]
         all_goals = len(goals)
         for goal in goals:
@@ -38,6 +37,7 @@ class Updater:
                 scored_goals_time[4] += 1
             elif goal['time'] < 90:
                 scored_goals_time[5] += 1
+
         print("Strzelone gole: ", all_goals)
         print("0-15: ", scored_goals_time[0], str(scored_goals_time[0] / float(all_goals) * 100) + "%")
         print("16-30: ", scored_goals_time[1], str(scored_goals_time[1] / float(all_goals) * 100) + "%")
@@ -48,7 +48,7 @@ class Updater:
 
     def print_conceded_goals(self):
         goals = self.database.get_conceded_goals(self.url_to_club_page)
-        #print(goals)
+
         scored_goals_time = [0, 0, 0, 0, 0, 0]
         all_goals = len(goals)
         for goal in goals:
@@ -73,11 +73,6 @@ class Updater:
         print("76-90: ", scored_goals_time[5], str(scored_goals_time[5] / float(all_goals) * 100) + "%")
 
     def print_squad(self):
-        for i in self.database.get_squad_sql(self.url_to_club_page):
-            print(i)
-
-        print("###############")
-
         for i in self.database.get_squad(self.url_to_club_page):
             print(i)
 

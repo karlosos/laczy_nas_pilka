@@ -2,7 +2,7 @@ from unittest import TestCase
 import unittest.mock
 import io
 
-from okregowastats.Updater import Updater
+from okregowastats.updater import Updater
 
 class TestUpdater(TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
