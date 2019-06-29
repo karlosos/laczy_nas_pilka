@@ -7,7 +7,7 @@ class Updater:
     def __init__(self, database_name, url_to_matches_list_page, url_to_club_page):
         self.database = Database(database_name)
         self.url_to_matches_list_page = url_to_matches_list_page
-        self.url_to_club_page =url_to_club_page
+        self.url_to_club_page = url_to_club_page
         # url_to_matches_list_page = "https://www.laczynaspilka.pl/rozgrywki/nizsze-ligi,20725.html?round=19"
         # url_to_club_page = None
 

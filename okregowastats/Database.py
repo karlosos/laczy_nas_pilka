@@ -70,7 +70,7 @@ class Player(Base):
     __tablename__ = 'player'
     id = Column(String, primary_key=True)
     name = Column(String)
-    date_of_birth = Column(Date)
+    age = Column(Integer)
     team_id = Column(String, ForeignKey('team.id'))
     team = relationship(lambda: Team, backref=backref('sqads'), uselist=True)
     matches = Column(Integer)
@@ -78,7 +78,6 @@ class Player(Base):
     goals = Column(Integer)
     yellow_cards = Column(Integer)
     red_cards = Column(Integer)
-
 
 
 class Database:
@@ -114,10 +113,9 @@ class Database:
             db_player.id = player[0]
             db_player.name = player[1]
             if player[2] != '':
-                db_player.date_of_birth = datetime.strptime(player[2], "%d.%m.%Y").date()
+                db_player.age = player[2]
             else:
-                db_player.date_of_birth = None
-
+                db_player.age = None
 
             db_player.team_id = player[3]
             db_player.matches = player[4]

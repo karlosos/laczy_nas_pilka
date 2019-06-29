@@ -131,7 +131,7 @@ class Parser:
             if player[1] not in seen:
                 seen.add(player[1])
                 player_info = self.get_player(player[1])
-                # player_link, birth, club, matches, minutes, goals, yellow_cards, red_cards
+                # player_link, age, club, matches, minutes, goals, yellow_cards, red_cards
                 self.players.append((player[1], player[0], player_info[1], player_info[2], player_info[3], player_info[4], player_info[5], player_info[6], player_info[7]))
 
     def player_clean(self, player):
@@ -177,7 +177,7 @@ class Parser:
     def get_player(self, player_link):
         try:
             soup = BeautifulSoup(self.get_player_page(player_link), "html.parser")
-            birth = soup.find('div', {'class': 'about-player'}).find_all('span')[1].text.strip()
+            age = soup.find('div', {'class': 'about-player'}).find_all('span')[1].text.strip()
             club = soup.find('section', {'class': 'fav-team'}).find('a')['href'].strip()
             stats = soup.find('section', {'class': 'season__stats'}).find_all('div')
             matches = stats[0].find('span', {'class': 'qty'}).text.strip();
@@ -185,7 +185,7 @@ class Parser:
             goals = stats[2].find('span', {'class': 'qty'}).text.strip();
             yellow_cards = stats[3].find_all('span')[1].text.strip();
             red_cards = stats[3].find_all('span')[2].text.strip();
-            return player_link, birth, club, matches, minutes, goals, yellow_cards, red_cards
+            return player_link, age, club, matches, minutes, goals, yellow_cards, red_cards
         except:
             return (player_link, '', '', '', '', '', '', '')
 
