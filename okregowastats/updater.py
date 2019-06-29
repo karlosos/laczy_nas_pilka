@@ -5,6 +5,12 @@ from okregowastats.database import Database
 
 class Updater:
     def __init__(self, database_name, url_to_matches_list_page, url_to_club_page):
+        """
+
+        :param database_name: filename of database
+        :param url_to_matches_list_page: where from download matches list
+        :param url_to_club_page: used only for getting stats from database, not used in scrapping
+        """
         self.database = Database(database_name)
         self.url_to_matches_list_page = url_to_matches_list_page
         self.url_to_club_page = url_to_club_page

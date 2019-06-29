@@ -8,3 +8,4 @@ pages/*
 venv/
 tests/pages/
 tests/test.db
+.venv/
