@@ -76,6 +76,11 @@ class Updater:
         for i in self.database.get_squad_sql(self.url_to_club_page):
             print(i)
 
+        print("###############")
+
+        for i in self.database.get_squad(self.url_to_club_page):
+            print(i)
+
     def print_form(self):
         """Print form of a team"""
         print(self.database.get_team_form(self.url_to_club_page, 5))

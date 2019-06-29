@@ -1,6 +1,6 @@
 import sqlite3
 
-from sqlalchemy import Table, Column, String, Integer, Date, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -9,7 +9,6 @@ from sqlalchemy import desc
 from sqlalchemy import create_engine
 from sqlalchemy import exc
 from sqlalchemy.sql import func
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -203,42 +202,36 @@ class Database:
         return goals
 
     def get_squad(self, club_id):
-        import timeit
         squad = []
         s = self.session()
         players = s.query(Player).filter(Player.appearances.any(team_id=club_id)).all()
         for player in players:
-            # TODO minutes player and last number - they return sqlalchemy.orm.query.Query object
-            start = timeit.default_timer()
             goals = s.query(Event).filter(Event.player_id == player.id,
                                           Event.type == 'i-report-ball').count()
             yellow_cards = s.query(Event).filter(Event.player_id == player.id,
                                                  Event.type == 'i-yellow-card').count()
             red_cards = s.query(Event).filter(Event.player_id == player.id,
                                               Event.type == 'i-red-card').count()
-            last_number = s.query(Squad.number).filter(Squad.player_id == player.id).limit(1)
+            last_number = s.query(Squad.number).filter(Squad.player_id == player.id).limit(1).first()[0]
             numbers = s.query(Squad.number, func.count(Squad.number)).filter(Squad.player_id == player.id).group_by(
                 Squad.number).all()
-            minutes_played = s.query(func.sum(Squad.time_played)).filter(Squad.player_id == player.id)
-            squad.append((player.name, last_number, numbers, minutes_played, goals, yellow_cards, red_cards))
-            stop = timeit.default_timer()
-            # print(stop - start)
+            minutes_played = s.query(func.sum(Squad.time_played)).filter(Squad.player_id == player.id).first()[0]
+            squad.append((player.name, minutes_played, numbers, last_number, goals, yellow_cards, red_cards))
         return squad
 
     def get_squad_sql(self, club_id):
-        import timeit
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
         cur.execute(
-            "SELECT player_id, SUM(time_played) FROM squad INNER JOIN player ON (squad.player_id = player.id) WHERE squad.team_id = ? GROUP BY `player_id` ORDER BY sum(time_played) DESC", (club_id,))
+            "SELECT player_id, SUM(time_played) FROM squad INNER JOIN player ON (squad.player_id = player.id) WHERE "
+            "squad.team_id = ? GROUP BY `player_id` ORDER BY sum(time_played) DESC", (club_id,))
         team_squad_tmp = cur.fetchall()
         team_squad = []
         for player in team_squad_tmp:
             player_id = player[0]
-            start = timeit.default_timer()
             cur.execute(
-                "SELECT number, count(number) FROM squad WHERE player_id = ? GROUP BY number ORDER BY count(number) DESC",
-                (player_id,))
+                "SELECT number, count(number) FROM squad WHERE player_id = ? GROUP BY number "
+                "ORDER BY count(number) DESC", (player_id,))
             numbers = cur.fetchall()
             cur.execute("SELECT number FROM squad WHERE player_id = ? limit 1", (player_id,))
             last_number = cur.fetchone()[0]
@@ -248,12 +241,10 @@ class Database:
             yellow_cards = cur.fetchone()[0]
             cur.execute("SELECT count(*) FROM event WHERE player_id=? AND type='i-red-card'", (player_id,))
             red_cards = cur.fetchone()[0]
-            team_squad.append((player[0], player[1], numbers, last_number, goals, yellow_cards, red_cards));
-            stop = timeit.default_timer()
-            # print(stop - start)
+            team_squad.append((player[0], player[1], numbers, last_number, goals, yellow_cards, red_cards))
         return team_squad
 
-    def get_team_form(self, club_id, numer_of_matches):
+    def get_team_form(self, club_id, number_of_matches):
         """
         Get last matches and return list
         
@@ -261,21 +252,20 @@ class Database:
         name of team_b, score_a, score_b, date.
         
         :param club_id: id of club  
-        :param numer_of_matches: how many last matches to get
+        :param number_of_matches: how many last matches to get
         :return: list of tuples with format like ('L', 'STAL SZCZECIN', 'CHEMIK POLICE', 0, 7)
         """
         s = self.session()
         form_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id))\
-            .order_by(desc(Match.date)).limit(numer_of_matches).all()
+            .order_by(desc(Match.date)).limit(number_of_matches).all()
 
         form = []
         for match in form_query:
-            result = ""
-            if (match.score_a == match.score_b):
+            if match.score_a == match.score_b:
                 result = "D"
-            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+            elif match.score_a > match.score_b and match.team_a_id == club_id:
                 result = "W"
-            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+            elif match.score_a < match.score_b and match.team_b_id == club_id:
                 result = "W"
             else:
                 result = "L"
@@ -284,16 +274,17 @@ class Database:
 
         return form
 
-    def get_average_points_per_match(self, club_id, competition_id = ""):
+    def get_average_points_per_match(self, club_id, competition_id=""):
         """
         Return average points per match
         
-        :param club_id: 
+        :param club_id:
+        :param competition_id:
         :return: 
         """
 
         s = self.session()
-        if (competition_id == ""):
+        if competition_id == "":
             matches_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
         else:
             matches_query = s.query(Match).filter(Match.competition_id == competition_id)\
@@ -304,11 +295,11 @@ class Database:
         points = 0
         # calculate points
         for match in matches_query:
-            if (match.score_a == match.score_b):
+            if match.score_a == match.score_b:
                 points = points + 1
-            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+            elif match.score_a > match.score_b and match.team_a_id == club_id:
                 points = points + 3
-            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+            elif match.score_a < match.score_b and match.team_b_id == club_id:
                 points = points + 3
 
         return points/number_of_matches
@@ -323,7 +314,7 @@ class Database:
         :return: 
         """
         s = self.session()
-        if (competition_id == ""):
+        if competition_id == "":
             matches_query = s.query(Match).filter(or_(Match.team_a_id == club_id, Match.team_b_id == club_id)).all()
         else:
             matches_query = s.query(Match).filter(Match.competition_id == competition_id) \
@@ -337,16 +328,16 @@ class Database:
         # calculate points
         for match in matches_query:
             print(match.team_a.name + " " + str(match.score_a) + ":" + str(match.score_b) + " " + match.team_b.name)
-            if (match.score_a == match.score_b):
+            if match.score_a == match.score_b:
                 draws += 1
-            elif (match.score_a > match.score_b and match.team_a_id == club_id):
+            elif match.score_a > match.score_b and match.team_a_id == club_id:
                 wins += 1
-            elif (match.score_a < match.score_b and match.team_b_id == club_id):
+            elif match.score_a < match.score_b and match.team_b_id == club_id:
                 wins += 1
             else:
                 loses += 1
 
-        return (wins, draws, loses, number_of_matches)
+        return wins, draws, loses, number_of_matches
 
     def get_win_percentage(self, club_id, competition_id=""):
         """
@@ -400,7 +391,8 @@ class Database:
 
         matches = []
         for match in matches_query:
-            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date,
+                            match.competition_id))
 
         return matches
 
@@ -426,7 +418,8 @@ class Database:
 
         matches = []
         for match in matches_query:
-            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date,
+                            match.competition_id))
 
         return matches
 
@@ -452,6 +445,7 @@ class Database:
 
         matches = []
         for match in matches_query:
-            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date, match.competition_id))
+            matches.append((match.team_a.name, match.team_b.name, match.score_a, match.score_b, match.date,
+                            match.competition_id))
 
         return matches
